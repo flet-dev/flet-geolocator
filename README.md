@@ -6,6 +6,25 @@
 
 Add `flet-geolocator` as dependency (`pyproject.toml` or `requirements.txt`) to your Flet project.
 
+```bash
+# uv
+uv add flet-geolocator
+# poetry
+poetry add flet-geolocator
+# pip
+pip install flet-geolocator
+```
+
+sample pyproject.toml:
+```toml
+dependencies = [
+    "flet==0.27.6",
+    "flet-geolocator"
+]
+```
+
+
+
 ## Example
 
 ```py
@@ -116,4 +135,21 @@ async def main(page: ft.Page):
 
 
 ft.app(main)
+```
+
+## Build
+
+Use the --permissions argument in the build command:
+
+```bash
+flet build apk --permissions location
+```
+
+
+
+```bash
+# android install
+adb install build/apk/app-release.apk
+Performing Streamed Install
+Success
 ```
