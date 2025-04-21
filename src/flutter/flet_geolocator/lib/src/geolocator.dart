@@ -8,40 +8,18 @@ import 'package:geolocator/geolocator.dart';
 
 import 'utils/geolocator.dart';
 
-class GeolocatorControl extends StatefulWidget {
-  final Control? parent;
-  final Control control;
-  final FletControlBackend backend;
-
-  const GeolocatorControl(
-      {super.key,
-      required this.parent,
-      required this.control,
-      required this.backend});
+class GeolocatorService extends FletService {
+  GeolocatorService({required super.control});
 
   @override
-  State<GeolocatorControl> createState() => _GeolocatorControlState();
-}
-
-class _GeolocatorControlState extends State<GeolocatorControl>
-    with FletStoreMixin {
-  StreamSubscription<Position>? _onPositionChangedSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    debugPrint("Geolocator.initState($hashCode)");
-    widget.control.onRemove.clear();
-    widget.control.onRemove.add(_onRemove);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (widget.control.attrBool("onPositionChange", false)!) {
+  void init() {
+    super.init();
+    debugPrint("Geolocator(${control.id}).init: ${control.properties}");
+    control.addInvokeMethodListener(_invokeMethod);
+    if (control.getBool("on_position_change", false)!) {
       _onPositionChangedSubscription = Geolocator.getPositionStream(
         locationSettings: parseLocationSettings(
-            widget.control, "locationSettings", Theme.of(context)),
+            control.get("location_settings"), Theme.of(context)),
       ).listen(
         (Position? newPosition) {
           if (newPosition != null) {
@@ -53,8 +31,7 @@ class _GeolocatorControlState extends State<GeolocatorControl>
         },
         onError: (Object error, StackTrace stackTrace) {
           debugPrint('Geolocator Error getting stream position: $error');
-          widget.backend.triggerControlEvent(
-              widget.control.id, "error", error.toString());
+          control.triggerEvent("error", error.toString());
         },
         onDone: () {
           debugPrint('Geolocator: Done getting stream position.');
@@ -63,79 +40,57 @@ class _GeolocatorControlState extends State<GeolocatorControl>
     }
   }
 
-  void _onRemove() {
-    debugPrint("Geolocator.remove($hashCode)");
-    _onPositionChangedSubscription?.cancel();
-    widget.backend.unsubscribeMethods(widget.control.id);
-  }
-
-  @override
-  void deactivate() {
-    debugPrint("Geolocator.deactivate($hashCode)");
-    _onPositionChangedSubscription?.cancel();
-    super.deactivate();
-  }
-
   void _onPositionChange(Position position) {
-    debugPrint("Geolocator onPosition: $position");
-    final jsonData = jsonEncode({
-      "lat": position.latitude,
-      "long": position.longitude,
+    control.triggerEvent("position_change", {
+      "latitude": position.latitude,
+      "longitude": position.longitude,
     });
-    widget.backend
-        .triggerControlEvent(widget.control.id, "positionChange", jsonData);
+  }
+
+  Future<dynamic> _invokeMethod(String name, dynamic args) async {
+    debugPrint("Geolocator.$name($args)");
+    switch (name) {
+      case "request_permission":
+        var permission = await Geolocator.requestPermission();
+        return permission.name;
+      case "get_permission_status":
+        var permission = await Geolocator.checkPermission();
+        return permission.name;
+      case "is_location_service_enabled":
+        var serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        return serviceEnabled;
+      case "open_app_settings":
+        if (!kIsWeb) {
+          await Geolocator.openAppSettings();
+        }
+        break;
+      case "open_location_settings":
+        if (!kIsWeb) {
+          await Geolocator.openLocationSettings();
+        }
+        break;
+      case "get_last_known_position":
+        if (!kIsWeb) {
+          Position? position = await Geolocator.getLastKnownPosition();
+          return positionAsMap(position);
+        }
+        break;
+      case "get_current_position":
+        Position currentPosition = await Geolocator.getCurrentPosition(
+          locationSettings: parseLocationSettings(
+              args["location_settings"], Theme.of(context)),
+        );
+        return positionAsMap(currentPosition)!;
+      default:
+        throw Exception("Unknown Geolocator method: $name");
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    debugPrint(
-        "Geolocator build: ${widget.control.id} (${widget.control.hashCode})");
-
-    () async {
-      widget.backend.subscribeMethods(widget.control.id,
-          (methodName, args) async {
-        switch (methodName) {
-          case "request_permission":
-            var permission = await Geolocator.requestPermission();
-            return permission.name;
-          case "get_permission_status":
-            var permission = await Geolocator.checkPermission();
-            return permission.name;
-          case "is_location_service_enabled":
-            var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-            return serviceEnabled.toString();
-          case "open_app_settings":
-            if (!kIsWeb) {
-              var opened = await Geolocator.openAppSettings();
-              return opened.toString();
-            }
-            break;
-          case "open_location_settings":
-            if (!kIsWeb) {
-              var opened = await Geolocator.openLocationSettings();
-              return opened.toString();
-            }
-            break;
-          case "get_last_known_position":
-            if (!kIsWeb) {
-              Position? position = await Geolocator.getLastKnownPosition();
-              return positionToJson(position);
-            }
-            break;
-          case "get_current_position":
-            Position currentPosition = await Geolocator.getCurrentPosition(
-              locationSettings: locationSettingsFromJson(
-                  args["location_settings"] != null
-                      ? jsonDecode(args["location_settings"]!)
-                      : null,
-                  Theme.of(context)),
-            );
-            return positionToJson(currentPosition)!;
-        }
-        return null;
-      });
-    }();
-
-    return const SizedBox.shrink();
+  void dispose() {
+    debugPrint("Geolocator(${control.id}).dispose()");
+    control.removeInvokeMethodListener(_invokeMethod);
+    _onPositionChangedSubscription?.cancel();
+    super.dispose();
   }
 }

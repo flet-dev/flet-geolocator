@@ -1,5 +1,5 @@
-from flet_geolocator.geolocator import (
-    Geolocator,
+from .geolocator import Geolocator
+from .types import (
     GeolocatorActivityType,
     GeolocatorAndroidSettings,
     GeolocatorAppleSettings,
