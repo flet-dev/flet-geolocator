@@ -1,15 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flet/flet.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'utils/geolocator.dart';
 
 class GeolocatorService extends FletService {
   GeolocatorService({required super.control});
+
+  StreamSubscription<Position>? _onPositionChangedSubscription;
 
   @override
   void init() {
@@ -19,7 +19,9 @@ class GeolocatorService extends FletService {
     if (control.getBool("on_position_change", false)!) {
       _onPositionChangedSubscription = Geolocator.getPositionStream(
         locationSettings: parseLocationSettings(
-            control.get("location_settings"), Theme.of(context)),
+          control.get("location_settings"),
+          // Theme.of(context),
+        ),
       ).listen(
         (Position? newPosition) {
           if (newPosition != null) {
@@ -41,10 +43,7 @@ class GeolocatorService extends FletService {
   }
 
   void _onPositionChange(Position position) {
-    control.triggerEvent("position_change", {
-      "latitude": position.latitude,
-      "longitude": position.longitude,
-    });
+    control.triggerEvent("position_change", {"position": position.toMap()});
   }
 
   Future<dynamic> _invokeMethod(String name, dynamic args) async {
@@ -71,16 +70,14 @@ class GeolocatorService extends FletService {
         break;
       case "get_last_known_position":
         if (!kIsWeb) {
-          Position? position = await Geolocator.getLastKnownPosition();
-          return positionAsMap(position);
+          return (await Geolocator.getLastKnownPosition())?.toMap();
         }
         break;
       case "get_current_position":
         Position currentPosition = await Geolocator.getCurrentPosition(
-          locationSettings: parseLocationSettings(
-              args["location_settings"], Theme.of(context)),
+          locationSettings: parseLocationSettings(args["location_settings"]),
         );
-        return positionAsMap(currentPosition)!;
+        return currentPosition.toMap();
       default:
         throw Exception("Unknown Geolocator method: $name");
     }

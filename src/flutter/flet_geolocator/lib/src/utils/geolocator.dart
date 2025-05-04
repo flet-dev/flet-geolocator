@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flet/flet.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 LocationAccuracy? parseLocationAccuracy(String? value,
@@ -12,23 +11,21 @@ LocationAccuracy? parseLocationAccuracy(String? value,
       defaultValue;
 }
 
-Map? positionAsMap(Position? value) {
-  if (value == null) return null;
-
-  return {
-    "latitude": value.latitude,
-    "longitude": value.longitude,
-    "speed": value.speed,
-    "altitude": value.altitude,
-    "timestamp": value.timestamp,
-    "accuracy": value.accuracy,
-    "altitude_accuracy": value.altitudeAccuracy,
-    "heading": value.heading,
-    "heading_accuracy": value.headingAccuracy,
-    "speed_accuracy": value.speedAccuracy,
-    "floor": value.floor,
-    "is_mocked": value.isMocked,
-  };
+extension PositionExtension on Position {
+  Map<String, dynamic> toMap() => {
+        "latitude": latitude,
+        "longitude": longitude,
+        "speed": speed,
+        "altitude": altitude,
+        "timestamp": timestamp,
+        "accuracy": accuracy,
+        "altitude_accuracy": altitudeAccuracy,
+        "heading": heading,
+        "heading_accuracy": headingAccuracy,
+        "speed_accuracy": speedAccuracy,
+        "floor": floor,
+        "is_mocked": isMocked,
+      };
 }
 
 ActivityType? parseActivityType(String? value, [ActivityType? defaultValue]) {
@@ -38,7 +35,7 @@ ActivityType? parseActivityType(String? value, [ActivityType? defaultValue]) {
       defaultValue;
 }
 
-LocationSettings? parseLocationSettings(dynamic value, ThemeData? theme,
+LocationSettings? parseLocationSettings(dynamic value,
     [LocationSettings? defaultValue]) {
   if (value == null) return defaultValue;
 
@@ -75,8 +72,8 @@ LocationSettings? parseLocationSettings(dynamic value, ThemeData? theme,
                     value["foreground_notification_enable_wake_lock"], false)!,
                 enableWifiLock: parseBool(
                     value["foreground_notification_enable_wifi_lock"], false)!,
-                color:
-                    parseColor(value["foreground_notification_color"], theme),
+                // color:
+                //   parseColor(value["foreground_notification_color"], theme),
                 notificationChannelName:
                     value["foreground_notification_channel_name"] ??
                         'Background Location',

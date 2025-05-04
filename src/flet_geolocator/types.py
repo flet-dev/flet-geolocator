@@ -93,5 +93,4 @@ class GeolocatorAndroidSettings(GeolocatorSettings):
 
 
 class GeolocatorPositionChangeEvent(ft.ControlEvent):
-    latitude: float
-    longitude: float
+    position: GeolocatorPosition = None
