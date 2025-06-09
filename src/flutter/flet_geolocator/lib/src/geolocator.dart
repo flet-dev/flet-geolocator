@@ -19,24 +19,20 @@ class GeolocatorService extends FletService {
     if (control.getBool("on_position_change", false)!) {
       _onPositionChangedSubscription = Geolocator.getPositionStream(
         locationSettings: parseLocationSettings(
-          control.get("location_settings"),
+          control.get("configuration"),
           // Theme.of(context),
         ),
       ).listen(
         (Position? newPosition) {
           if (newPosition != null) {
             _onPositionChange(newPosition);
-            debugPrint('Geolocator - $newPosition');
-          } else {
-            debugPrint('Geolocator: Position is null.');
           }
         },
         onError: (Object error, StackTrace stackTrace) {
-          debugPrint('Geolocator Error getting stream position: $error');
           control.triggerEvent("error", error.toString());
         },
         onDone: () {
-          debugPrint('Geolocator: Done getting stream position.');
+          // done
         },
       );
     }
@@ -75,7 +71,7 @@ class GeolocatorService extends FletService {
         break;
       case "get_current_position":
         Position currentPosition = await Geolocator.getCurrentPosition(
-          locationSettings: parseLocationSettings(args["location_settings"]),
+          locationSettings: parseLocationSettings(args["settings"]),
         );
         return currentPosition.toMap();
       default:

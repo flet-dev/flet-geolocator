@@ -1,12 +1,13 @@
 from .geolocator import Geolocator
 from .types import (
-    GeolocatorActivityType,
-    GeolocatorAndroidSettings,
-    GeolocatorAppleSettings,
+    ForegroundNotificationConfiguration,
+    GeolocatorAndroidConfiguration,
+    GeolocatorConfiguration,
+    GeolocatorIosActivityType,
+    GeolocatorIosConfiguration,
     GeolocatorPermissionStatus,
     GeolocatorPosition,
     GeolocatorPositionAccuracy,
     GeolocatorPositionChangeEvent,
-    GeolocatorSettings,
-    GeolocatorWebSettings,
+    GeolocatorWebConfiguration,
 )

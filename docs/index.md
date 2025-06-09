@@ -1,0 +1,34 @@
+# flet-geolocator
+
+[![pypi](https://img.shields.io/pypi/v/flet-geolocator.svg)](https://pypi.python.org/pypi/flet-geolocator)
+[![downloads](https://static.pepy.tech/badge/flet-geolocator/month)](https://pepy.tech/project/flet-geolocator)
+[![license](https://img.shields.io/github/license/flet-dev/flet-geolocator.svg)](https://github.com/flet-dev/flet-geolocator/blob/main/LICENSE)
+
+Adds geolocation capabilities to your Flet apps. 
+
+Features include:
+- Get the last known location;
+- Get the current location of the device;
+- Get continuous location updates;
+- Check if location services are enabled on the device.
+
+It is based on the [geolocator](https://pub.dev/packages/geolocator) Flutter package.
+
+## Platform Support
+
+This package supports the following platforms:
+
+| Platform | Supported |
+|----------|:---------:|
+| Windows  |     ✅     |
+| macOS    |     ✅     |
+| Linux    |     ✅     |
+| iOS      |     ✅     |
+| Android  |     ✅     |
+| Web      |     ✅     |
+
+## Example
+
+```python title="main.py"
+--8<-- "examples/geolocator_example/src/main.py"
+``` 

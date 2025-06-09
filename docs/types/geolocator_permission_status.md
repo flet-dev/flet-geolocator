@@ -1,0 +1,1 @@
+::: flet_geolocator.types.GeolocatorPermissionStatus

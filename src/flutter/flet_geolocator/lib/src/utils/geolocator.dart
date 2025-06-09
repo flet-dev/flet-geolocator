@@ -55,9 +55,7 @@ LocationSettings? parseLocationSettings(dynamic value,
         accuracy: accuracy,
         distanceFilter: distanceFilter,
         timeLimit: timeLimit,
-        forceLocationManager:
-            parseBool(value["force_location_manager"], false)!,
-        intervalDuration: parseDuration(value["interval_duration"]),
+        intervalDuration: parseDuration(value["interval_duration"], const Duration(milliseconds: 5000)!),
         useMSLAltitude: parseBool(value["use_msl_altitude"], false)!,
         // Needed to prevet background to stop working when app goes in background
         foregroundNotificationConfig: (value["foreground_notification_text"] !=
