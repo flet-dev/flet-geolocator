@@ -2,7 +2,7 @@
 site_name: "flet-geolocator"
 site_url: https://flet-dev.github.io/flet-geolocator/
 site_author: Flet Contributors
-site_description: D
+site_description: Adds geolocation capabilities to your Flet apps.
 
 # Repository
 edit_uri: edit/main/docs/

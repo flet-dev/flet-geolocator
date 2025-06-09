@@ -7,7 +7,6 @@ from .types import (
     GeolocatorConfiguration,
     GeolocatorPermissionStatus,
     GeolocatorPosition,
-    GeolocatorPositionAccuracy,
     GeolocatorPositionChangeEvent,
 )
 
@@ -20,6 +19,13 @@ class Geolocator(ft.Service):
     A control that allows you to fetch GPS data from your device.
 
     This control is non-visual and should be added to `page.overlay` list.
+    """
+
+    position: Optional[GeolocatorPosition] = None
+    """
+    The current position of the device.
+
+    Starts as `None` and will be updated when the position changes.
     """
 
     configuration: Optional[GeolocatorConfiguration] = None
@@ -43,7 +49,8 @@ class Geolocator(ft.Service):
 
     async def get_current_position_async(
         self,
-        configuration: Optional[GeolocatorConfiguration],
+        configuration: Optional[GeolocatorConfiguration] = None,
+        timeout: float = 30,
     ) -> GeolocatorPosition:
         """
         Gets the current position of the device with the desired accuracy and settings.
@@ -51,6 +58,11 @@ class Geolocator(ft.Service):
         Args:
             configuration: Additional configuration for the location request.
                 If not specified, then the [`Geolocator.configuration`][...] property is used.
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+
+        Raises:
+            TimeoutError: If the request times out.
+
         Returns:
             The current position of the device as a [`GeolocatorPosition`][(p).types.].
 
@@ -59,14 +71,10 @@ class Geolocator(ft.Service):
             It is recommended to call the [`get_last_known_position`][..] method first to receive a
             known/cached position and update it with the result of the [`get_current_position`][..] method.
         """
-        s = (
-            configuration
-            or self.configuration
-            or GeolocatorConfiguration(accuracy=GeolocatorPositionAccuracy.BEST)
-        )
         r = await self._invoke_method_async(
             method_name="get_current_position",
-            arguments={"configuration": s},
+            arguments={"configuration": configuration or self.configuration},
+            timeout=timeout,
         )
         return GeolocatorPosition(**r)
 
@@ -146,25 +154,7 @@ class Geolocator(ft.Service):
             "is_location_service_enabled", timeout=timeout
         )
 
-    def open_app_settings(self, timeout: float = 10):
-        """
-        Attempts to open the app's settings.
-
-        Not supported on web plaform.
-
-        Args:
-            timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            AssertionError: If called on a web page, as this method is not supported on web.
-            TimeoutError: If the request times out.
-
-        Returns:
-            `True` if the app's settings were opened successfully, `False` otherwise.
-        """
-        asyncio.create_task(self.open_app_settings_async(timeout=timeout))
-
-    async def open_app_settings_async(self, timeout: float = 10):
+    async def open_app_settings_async(self, timeout: float = 10) -> bool:
         """
         Attempts to open the app's settings.
 
@@ -181,7 +171,7 @@ class Geolocator(ft.Service):
             `True` if the app's settings were opened successfully, `False` otherwise.
         """
         assert not self.page.web, "open_app_settings is not supported on web"
-        await self._invoke_method_async("open_app_settings", timeout=timeout)
+        return await self._invoke_method_async("open_app_settings", timeout=timeout)
 
     def open_location_settings(self, timeout: float = 10):
         """
@@ -219,3 +209,41 @@ class Geolocator(ft.Service):
         """
         assert not self.page.web, "open_location_settings is not supported on web"
         await self._invoke_method_async("open_location_settings", timeout=timeout)
+
+    async def distance_between_async(
+        self,
+        start_latitude: ft.Number,
+        start_longitude: ft.Number,
+        end_latitude: ft.Number,
+        end_longitude: ft.Number,
+        timeout: float = 10,
+    ):
+        """
+        Calculates the distance between the supplied coordinates in meters.
+
+        The distance between the coordinates is calculated using the
+        Haversine formula (see https://en.wikipedia.org/wiki/Haversine_formula).
+
+        Args:
+            start_latitude: The latitude of the starting point, in degrees.
+            start_longitude: The longitude of the starting point, in degrees.
+            end_latitude: The latitude of the ending point, in degrees.
+            end_longitude: The longitude of the ending point, in degrees.
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+
+        Raises:
+            TimeoutError: If the request times out.
+
+        Returns:
+            The distance between the coordinates in meters.
+        """
+        await self._invoke_method_async(
+            "distance_between",
+            arguments={
+                "start_latitude": start_latitude,
+                "start_longitude": start_longitude,
+                "end_latitude": end_latitude,
+                "end_longitude": end_longitude,
+            },
+            timeout=timeout,
+        )

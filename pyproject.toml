@@ -1,11 +1,9 @@
 [project]
 name = "flet-geolocator"
 version = "0.2.0"
-description = "Geolocator control for Flet"
+description = "Adds geolocation capabilities to your Flet apps."
 readme = "README.md"
-authors = [
-    { name = "Flet contributors", email = "hello@flet.dev" }
-]
+authors = [{ name = "Flet contributors", email = "hello@flet.dev" }]
 license = "Apache-2.0"
 requires-python = ">=3.10"
 dependencies = [
@@ -38,7 +36,7 @@ docs = [
 ]
 
 [tool.uv.sources]
-flet = { git = "https://github.com/flet-dev/flet", subdirectory = "sdk/python/packages/flet", rev = "v1" }
+# flet = { git = "https://github.com/flet-dev/flet", subdirectory = "sdk/python/packages/flet", rev = "v1" }
 
 [build-system]
 requires = ["setuptools"]

@@ -16,30 +16,36 @@ class GeolocatorService extends FletService {
     super.init();
     debugPrint("Geolocator(${control.id}).init: ${control.properties}");
     control.addInvokeMethodListener(_invokeMethod);
-    if (control.getBool("on_position_change", false)!) {
-      _onPositionChangedSubscription = Geolocator.getPositionStream(
-        locationSettings: parseLocationSettings(
-          control.get("configuration"),
-          // Theme.of(context),
-        ),
-      ).listen(
-        (Position? newPosition) {
-          if (newPosition != null) {
-            _onPositionChange(newPosition);
-          }
-        },
-        onError: (Object error, StackTrace stackTrace) {
-          control.triggerEvent("error", error.toString());
-        },
-        onDone: () {
-          // done
-        },
-      );
-    }
+    registerEvents();
   }
 
-  void _onPositionChange(Position position) {
-    control.triggerEvent("position_change", {"position": position.toMap()});
+  @override
+  void update() {
+    debugPrint("Geolocator(${control.id}).update: ${control.properties}");
+    registerEvents();
+  }
+
+  void registerEvents() {
+    _onPositionChangedSubscription = Geolocator.getPositionStream(
+      locationSettings: parseLocationSettings(
+        control.get("configuration"),
+        // Theme.of(context),
+      ),
+    ).listen(
+      (Position? position) {
+        if (position != null) {
+          control.updateProperties({"position": position.toMap()});
+          control
+              .triggerEvent("position_change", {"position": position.toMap()});
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        control.triggerEvent("error", error.toString());
+      },
+      onDone: () {
+        // done
+      },
+    );
   }
 
   Future<dynamic> _invokeMethod(String name, dynamic args) async {
@@ -56,7 +62,7 @@ class GeolocatorService extends FletService {
         return serviceEnabled;
       case "open_app_settings":
         if (!kIsWeb) {
-          await Geolocator.openAppSettings();
+          return await Geolocator.openAppSettings();
         }
         break;
       case "open_location_settings":
@@ -70,10 +76,27 @@ class GeolocatorService extends FletService {
         }
         break;
       case "get_current_position":
-        Position currentPosition = await Geolocator.getCurrentPosition(
-          locationSettings: parseLocationSettings(args["settings"]),
-        );
-        return currentPosition.toMap();
+        try {
+          Position currentPosition = await Geolocator.getCurrentPosition(
+            locationSettings: parseLocationSettings(args["settings"]),
+          );
+          return currentPosition.toMap();
+        } catch (error, stackTrace) {
+          control.triggerEvent("error", error.toString());
+          break;
+        }
+      case "distance_between":
+        var p = [
+          args["start_latitude"],
+          args["start_longitude"],
+          args["end_latitude"],
+          args["end_longitude"]
+        ];
+
+        if (p.every((e) => e != null)) {
+          return Geolocator.distanceBetween(p[0], p[1], p[2], p[3]);
+        }
+        break;
       default:
         throw Exception("Unknown Geolocator method: $name");
     }

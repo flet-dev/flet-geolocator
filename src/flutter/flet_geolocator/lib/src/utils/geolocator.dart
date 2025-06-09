@@ -24,7 +24,7 @@ extension PositionExtension on Position {
         "heading_accuracy": headingAccuracy,
         "speed_accuracy": speedAccuracy,
         "floor": floor,
-        "is_mocked": isMocked,
+        "mocked": isMocked,
       };
 }
 
@@ -55,7 +55,8 @@ LocationSettings? parseLocationSettings(dynamic value,
         accuracy: accuracy,
         distanceFilter: distanceFilter,
         timeLimit: timeLimit,
-        intervalDuration: parseDuration(value["interval_duration"], const Duration(milliseconds: 5000)!),
+        intervalDuration: parseDuration(
+            value["interval_duration"], const Duration(milliseconds: 5000))!,
         useMSLAltitude: parseBool(value["use_msl_altitude"], false)!,
         // Needed to prevet background to stop working when app goes in background
         foregroundNotificationConfig: (value["foreground_notification_text"] !=

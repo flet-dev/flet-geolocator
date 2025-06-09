@@ -241,7 +241,7 @@ class GeolocatorPosition:
     In all other cases this value will be `None`.
     """
 
-    is_mocked: Optional[bool] = None
+    mocked: Optional[bool] = None
     """
     Will be `True` on Android (starting from API level 18) when the location came
     from the mocked provider.
@@ -412,8 +412,9 @@ class GeolocatorAndroidConfiguration(GeolocatorConfiguration):
     foreground_notification_config: Optional[ForegroundNotificationConfiguration] = None
 
 
+@dataclass
 class GeolocatorPositionChangeEvent(ft.ControlEvent):
-    position: GeolocatorPosition = None
+    position: GeolocatorPosition
     """
     The current/new position of the device.
     """
