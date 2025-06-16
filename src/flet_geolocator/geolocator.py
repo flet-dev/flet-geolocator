@@ -21,13 +21,6 @@ class Geolocator(ft.Service):
     This control is non-visual and should be added to `page.overlay` list.
     """
 
-    position: Optional[GeolocatorPosition] = None
-    """
-    The current position of the device.
-
-    Starts as `None` and will be updated when the position changes.
-    """
-
     configuration: Optional[GeolocatorConfiguration] = None
     """
     Some additional configuration.
@@ -37,7 +30,7 @@ class Geolocator(ft.Service):
     """
     Fires when the position of the device changes.
 
-    Event handler argument is of type [`GeolocatorPositionChangeEvent`][(p).types.].
+    Event handler argument is of type [`GeolocatorPositionChangeEvent`][(p).].
     """
 
     on_error: ft.OptionalControlEventCallable = None
@@ -45,6 +38,13 @@ class Geolocator(ft.Service):
     Fires when an error occurs.
     
     The `data` property of the event handler argument contains information on the error. 
+    """
+
+    position: Optional[GeolocatorPosition] = None  # todo: make this property readonly
+    """
+    The current position of the device.
+
+    Starts as `None` and will be updated when the position changes.
     """
 
     async def get_current_position_async(
@@ -64,7 +64,7 @@ class Geolocator(ft.Service):
             TimeoutError: If the request times out.
 
         Returns:
-            The current position of the device as a [`GeolocatorPosition`][(p).types.].
+            The current position of the device as a [`GeolocatorPosition`][(p).].
 
         Note:
             Depending on the availability of different location services, this can take several seconds.

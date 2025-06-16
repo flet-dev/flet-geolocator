@@ -91,7 +91,7 @@ class GeolocatorPermissionStatus(Enum):
     """
     Permission to access the device's location is denied. 
 
-    The app should try to request permission using the [`Geolocator.request_permission`][(p).geolocator.] method.
+    The app should try to request permission using the [`Geolocator.request_permission`][(p).] method.
     """
 
     DENIED_FOREVER = "deniedForever"
@@ -116,7 +116,7 @@ class GeolocatorPermissionStatus(Enum):
     """
     Permission status cannot be determined.
 
-    This status is only returned by the [`Geolocator.request_permission`][(p).geolocator.] method on the web platform
+    This status is only returned by the [`Geolocator.request_permission`][(p).] method on the web platform
     for browsers that did not implement the Permissions API.
     See: https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
     """
@@ -159,19 +159,19 @@ class GeolocatorIosActivityType(Enum):
 class GeolocatorPosition:
     """Detailed location information."""
 
-    latitude: ft.OptionalNumber = None
+    latitude: Optional[ft.Number] = None
     """
     The latitude of this position in degrees normalized to the interval -90.0
     to +90.0 (both inclusive).
     """
 
-    longitude: ft.OptionalNumber = None
+    longitude: Optional[ft.Number] = None
     """
     The longitude of the position in degrees normalized to the interval -180
     (exclusive) to +180 (inclusive).
     """
 
-    speed: ft.OptionalNumber = None
+    speed: Optional[ft.Number] = None
     """
     The speed at which the device is traveling in meters per second over ground.
 
@@ -179,7 +179,7 @@ class GeolocatorPosition:
     In these cases the value is `0.0`.
     """
 
-    altitude: ft.OptionalNumber = None
+    altitude: Optional[ft.Number] = None
     """
     The altitude of the device in meters.
 
@@ -192,7 +192,7 @@ class GeolocatorPosition:
     The time at which this position was determined.
     """
 
-    accuracy: ft.OptionalNumber = None
+    accuracy: Optional[ft.Number] = None
     """
     The estimated horizontal accuracy of the position in meters.
 
@@ -200,7 +200,7 @@ class GeolocatorPosition:
     In these cases the value is `0.0`.
     """
 
-    altitude_accuracy: ft.OptionalNumber = None
+    altitude_accuracy: Optional[ft.Number] = None
     """
     The estimated vertical accuracy of the position in meters.
 
@@ -208,7 +208,7 @@ class GeolocatorPosition:
     In these cases the value is `0.0`.
     """
 
-    heading: ft.OptionalNumber = None
+    heading: Optional[ft.Number] = None
     """
     The heading in which the device is traveling in degrees.
 
@@ -216,7 +216,7 @@ class GeolocatorPosition:
     In these cases the value is `0.0`.
     """
 
-    heading_accuracy: ft.OptionalNumber = None
+    heading_accuracy: Optional[ft.Number] = None
     """
     The estimated heading accuracy of the position in degrees.
 
@@ -224,7 +224,7 @@ class GeolocatorPosition:
     In these cases the value is `0.0`.
     """
 
-    speed_accuracy: ft.OptionalNumber = None
+    speed_accuracy: Optional[ft.Number] = None
     """
     The estimated speed accuracy of this position, in meters per second.
 
@@ -375,7 +375,7 @@ class ForegroundNotificationConfiguration:
     the user cannot dismiss it.
     """
 
-    # foreground_notification_color: ft.OptionalColorValue = None
+    # foreground_notification_color: Optional[ft.ColorValue] = None
 
 
 @dataclass
