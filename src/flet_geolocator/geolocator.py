@@ -26,14 +26,16 @@ class Geolocator(ft.Service):
     Some additional configuration.
     """
 
-    on_position_change: ft.OptionalEventCallable[GeolocatorPositionChangeEvent] = None
+    on_position_change: ft.OptionalEventHandler[
+        GeolocatorPositionChangeEvent["Geolocator"]
+    ] = None
     """
     Fires when the position of the device changes.
 
     Event handler argument is of type [`GeolocatorPositionChangeEvent`][(p).].
     """
 
-    on_error: ft.OptionalControlEventCallable = None
+    on_error: ft.OptionalControlEventHandler["Geolocator"] = None
     """
     Fires when an error occurs.
     
@@ -57,7 +59,7 @@ class Geolocator(ft.Service):
 
         Args:
             configuration: Additional configuration for the location request.
-                If not specified, then the [`Geolocator.configuration`][...] property is used.
+                If not specified, then the [`Geolocator.configuration`][(p).] property is used.
             timeout: The maximum amount of time (in seconds) to wait for a response.
 
         Raises:
@@ -83,7 +85,7 @@ class Geolocator(ft.Service):
     ) -> GeolocatorPosition:
         """
         Gets the last known position stored on the user's device.
-        The accuracy can be defined using the [`Geolocator.configuration`][...] property.
+        The accuracy can be defined using the [`Geolocator.configuration`][(p).] property.
 
         Not supported on web plaform.
 

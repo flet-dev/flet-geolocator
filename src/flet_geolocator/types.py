@@ -255,8 +255,6 @@ class GeolocatorConfiguration:
     accuracy: GeolocatorPositionAccuracy = GeolocatorPositionAccuracy.BEST
     """
     Defines the desired accuracy that should be used to determine the location data.
-    
-    Defaults to `GeolocatorPositionAccuracy.BEST`.
     """
 
     distance_filter: int = 0
@@ -264,16 +262,14 @@ class GeolocatorConfiguration:
     The minimum distance (measured in meters) a device must move
     horizontally before an update event is generated.
     
-    Supply `0` when you want to be notified of all movements.
-
-    Defaults to `0`.
+    Set to `0` when you want to be notified of all movements.
     """
 
     time_limit: ft.DurationValue = None
     """
     Specifies a timeout interval.
 
-    Defaults to `None`, which means no time limit is set.
+    For no time limit, set to `None`.
     """
 
 
@@ -387,8 +383,6 @@ class GeolocatorAndroidConfiguration(GeolocatorConfiguration):
     )
     """
     The desired interval for active location updates.
-    
-    Defaults to `ft.Duration(milliseconds=5000)` - 5 milliseconds.
     """
 
     use_msl_altitude: bool = False
@@ -405,15 +399,13 @@ class GeolocatorAndroidConfiguration(GeolocatorConfiguration):
     
     This property only works with position stream updates and has no effect when getting the
     current position or last known position.
-
-    Defaults to `False`.
     """
 
     foreground_notification_config: Optional[ForegroundNotificationConfiguration] = None
 
 
 @dataclass
-class GeolocatorPositionChangeEvent(ft.ControlEvent):
+class GeolocatorPositionChangeEvent(ft.Event[ft.EventControlType]):
     position: GeolocatorPosition
     """
     The current/new position of the device.
