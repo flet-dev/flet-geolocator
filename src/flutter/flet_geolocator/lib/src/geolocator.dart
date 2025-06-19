@@ -81,7 +81,7 @@ class GeolocatorService extends FletService {
             locationSettings: parseLocationSettings(args["settings"]),
           );
           return currentPosition.toMap();
-        } catch (error, stackTrace) {
+        } catch (error) {
           control.triggerEvent("error", error.toString());
           break;
         }
