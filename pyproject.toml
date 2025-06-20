@@ -33,11 +33,12 @@ docs = [
     "pymdown-extensions",
     "mkdocs-glightbox",
     "mkdocs-section-index",
+    "griffe-modernized-annotations",
     "pygments>=2.16",
 ]
 
 [tool.uv.sources]
-# flet = { git = "https://github.com/flet-dev/flet", subdirectory = "sdk/python/packages/flet", rev = "v1" }
+flet = { git = "https://github.com/flet-dev/flet", subdirectory = "sdk/python/packages/flet", rev = "v1" }
 
 [build-system]
 requires = ["setuptools"]
@@ -63,10 +64,6 @@ select = [
     "SIM",
     # isort
     "I"
-]
-ignore = [
-    # Pyflakes
-    "F401", # unused import
 ]
 preview = true
 
