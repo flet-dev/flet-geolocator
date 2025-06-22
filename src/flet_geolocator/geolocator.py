@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import field
 from typing import Optional
 
 import flet as ft
@@ -42,9 +43,9 @@ class Geolocator(ft.Service):
     The `data` property of the event handler argument contains information on the error. 
     """
 
-    position: Optional[GeolocatorPosition] = None  # todo: make this property readonly
+    position: Optional[GeolocatorPosition] = field(default=None, init=False)  # todo: make this property readonly
     """
-    The current position of the device.
+    The current position of the device. (read-only)
 
     Starts as `None` and will be updated when the position changes.
     """
