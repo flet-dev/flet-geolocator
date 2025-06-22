@@ -62,12 +62,10 @@ class Geolocator(ft.Service):
             configuration: Additional configuration for the location request.
                 If not specified, then the [`Geolocator.configuration`][(p).] property is used.
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            TimeoutError: If the request times out.
-
         Returns:
             The current position of the device as a [`GeolocatorPosition`][(p).].
+        Raises:
+            TimeoutError: If the request times out.
 
         Note:
             Depending on the availability of different location services, this can take several seconds.
@@ -88,17 +86,16 @@ class Geolocator(ft.Service):
         Gets the last known position stored on the user's device.
         The accuracy can be defined using the [`Geolocator.configuration`][(p).] property.
 
-        Not supported on web plaform.
+        Note:
+            This method is not supported on web plaform.
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            AssertionError: If called on a web page, as this method is not supported on web.
-            TimeoutError: If the request times out.
-
         Returns:
             `True` if the app's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
         """
         assert not self.page.web, "get_last_known_position is not supported on web"
         r = await self._invoke_method_async("get_last_known_position", timeout=timeout)
@@ -112,12 +109,10 @@ class Geolocator(ft.Service):
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            TimeoutError: If the request times out.
-
         Returns:
             The status of the permission.
+        Raises:
+            TimeoutError: If the request times out.
         """
         r = await self._invoke_method_async("get_permission_status", timeout=timeout)
         return GeolocatorPermissionStatus(r)
@@ -130,12 +125,10 @@ class Geolocator(ft.Service):
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            TimeoutError: If the request times out.
-
         Returns:
             The status of the permission request.
+        Raises:
+            TimeoutError: If the request times out.
         """
         r = await self._invoke_method_async("request_permission", timeout=timeout)
         return GeolocatorPermissionStatus(r)
@@ -146,12 +139,10 @@ class Geolocator(ft.Service):
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            TimeoutError: If the request times out.
-
         Returns:
             `True` if location service is enabled, `False` otherwise.
+        Raises:
+            TimeoutError: If the request times out.
         """
         return await self._invoke_method_async(
             "is_location_service_enabled", timeout=timeout
@@ -161,17 +152,16 @@ class Geolocator(ft.Service):
         """
         Attempts to open the app's settings.
 
-        Not supported on web plaform.
+        Note:
+            This method is not supported on web plaform.
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            AssertionError: If called on a web page, as this method is not supported on web.
-            TimeoutError: If the request times out.
-
         Returns:
             `True` if the app's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
         """
         assert not self.page.web, "open_app_settings is not supported on web"
         return await self._invoke_method_async("open_app_settings", timeout=timeout)
@@ -180,17 +170,16 @@ class Geolocator(ft.Service):
         """
         Attempts to open the device's location settings.
 
-        Not supported on web plaform.
+        Note:
+            This method is not supported on web plaform.
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            AssertionError: If called on a web page, as this method is not supported on web.
-            TimeoutError: If the request times out.
-
         Returns:
             `True` if the device's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
         """
         asyncio.create_task(self.open_location_settings_async(timeout=timeout))
 
@@ -198,17 +187,16 @@ class Geolocator(ft.Service):
         """
         Attempts to open the device's location settings.
 
-        Not supported on web plaform.
+        Note:
+            This method is not supported on web plaform.
 
         Args:
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            AssertionError: If called on a web page, as this method is not supported on web.
-            TimeoutError: If the request times out.
-
         Returns:
             `True` if the device's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
         """
         assert not self.page.web, "open_location_settings is not supported on web"
         await self._invoke_method_async("open_location_settings", timeout=timeout)
@@ -233,15 +221,13 @@ class Geolocator(ft.Service):
             end_latitude: The latitude of the ending point, in degrees.
             end_longitude: The longitude of the ending point, in degrees.
             timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Raises:
-            TimeoutError: If the request times out.
-
         Returns:
             The distance between the coordinates in meters.
+        Raises:
+            TimeoutError: If the request times out.
         """
         await self._invoke_method_async(
-            "distance_between",
+            method_name="distance_between",
             arguments={
                 "start_latitude": start_latitude,
                 "start_longitude": start_longitude,
