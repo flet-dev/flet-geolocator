@@ -4,13 +4,13 @@
 [![downloads](https://static.pepy.tech/badge/flet-geolocator/month)](https://pepy.tech/project/flet-geolocator)
 [![license](https://img.shields.io/github/license/flet-dev/flet-geolocator.svg)](https://github.com/flet-dev/flet-geolocator/blob/main/LICENSE)
 
-Adds geolocation capabilities to your Flet apps. 
+Adds geolocation capabilities to your [Flet](https://flet.dev) apps. 
 
 Features include:
-- Get the last known location;
-- Get the current location of the device;
-- Get continuous location updates;
-- Check if location services are enabled on the device.
+    - Get the last known location;
+    - Get the current location of the device;
+    - Get continuous location updates;
+    - Check if location services are enabled on the device.
 
 It is based on the [geolocator](https://pub.dev/packages/geolocator) Flutter package.
 

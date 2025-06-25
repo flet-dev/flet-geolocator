@@ -1,119 +1,56 @@
-# Geolocator control for Flet
+# flet-geolocator
 
-`Geolocator` control for Flet.
+[![pypi](https://img.shields.io/pypi/v/flet-geolocator.svg)](https://pypi.python.org/pypi/flet-geolocator)
+[![downloads](https://static.pepy.tech/badge/flet-geolocator/month)](https://pepy.tech/project/flet-geolocator)
+[![license](https://img.shields.io/github/license/flet-dev/flet-geolocator.svg)](https://github.com/flet-dev/flet-geolocator/blob/main/LICENSE)
 
-## Usage
+Adds geolocation capabilities to your [Flet](https://flet.dev) apps. 
 
-Add `flet-geolocator` as dependency (`pyproject.toml` or `requirements.txt`) to your Flet project.
+Features include:
+- Get the last known location;
+- Get the current location of the device;
+- Get continuous location updates;
+- Check if location services are enabled on the device.
 
-## Example
+It is based on the [geolocator](https://pub.dev/packages/geolocator) Flutter package.
 
-```py
+## Documentation
 
-import flet as ft
+Detailed documentation to this package can be found [here](https://flet-dev.github.io/flet-geolocator/).
 
-import flet_geolocator as fg
+## Platform Support
 
+This package supports the following platforms:
 
-async def main(page: ft.Page):
-    page.scroll = ft.ScrollMode.ADAPTIVE
-    page.appbar = ft.AppBar(title=ft.Text("Geolocator Tests"))
+| Platform | Supported |
+|----------|:---------:|
+| Windows  |     ✅     |
+| macOS    |     ✅     |
+| Linux    |     ✅     |
+| iOS      |     ✅     |
+| Android  |     ✅     |
+| Web      |     ✅     |
 
-    def handle_position_change(e):
-        page.add(ft.Text(f"New position: {e.latitude} {e.longitude}"))
+## Installation
 
-    gl = fg.Geolocator(
-        location_settings=fg.GeolocatorSettings(
-            accuracy=fg.GeolocatorPositionAccuracy.LOW
-        ),
-        on_position_change=handle_position_change,
-        on_error=lambda e: page.add(ft.Text(f"Error: {e.data}")),
-    )
-    page.overlay.append(gl)
+To install the `flet-geolocator` package and add it to your project dependencies:
 
-    settings_dlg = lambda handler: ft.AlertDialog(
-        adaptive=True,
-        title=ft.Text("Opening Location Settings..."),
-        content=ft.Text(
-            "You are about to be redirected to the location/app settings. "
-            "Please locate this app and grant it location permissions."
-        ),
-        actions=[ft.TextButton(text="Take me there", on_click=handler)],
-        actions_alignment=ft.MainAxisAlignment.CENTER,
-    )
+- Using `uv`:
+    ```bash
+    uv add flet-geolocator
+    ```
 
-    async def handle_permission_request(e):
-        p = await gl.request_permission_async(wait_timeout=60)
-        page.add(ft.Text(f"request_permission: {p}"))
+- Using `pip`:
+    ```bash
+    pip install flet-geolocator
+    ```
+    After this, you will have to manually add this package to your `requirements.txt` or `pyproject.toml`.
 
-    async def handle_get_permission_status(e):
-        p = await gl.get_permission_status_async()
-        page.add(ft.Text(f"get_permission_status: {p}"))
+- Using `poetry`:
+    ```bash
+    poetry add flet-geolocator
+    ```
 
-    async def handle_get_current_position(e):
-        p = await gl.get_current_position_async()
-        page.add(ft.Text(f"get_current_position: ({p.latitude}, {p.longitude})"))
+## Examples
 
-    async def handle_get_last_known_position(e):
-        p = await gl.get_last_known_position_async()
-        page.add(ft.Text(f"get_last_known_position: ({p.latitude}, {p.longitude})"))
-
-    async def handle_location_service_enabled(e):
-        p = await gl.is_location_service_enabled_async()
-        page.add(ft.Text(f"is_location_service_enabled: {p}"))
-
-    async def handle_open_location_settings(e):
-        p = await gl.open_location_settings_async()
-        page.close(location_settings_dlg)
-        page.add(ft.Text(f"open_location_settings: {p}"))
-
-    async def handle_open_app_settings(e):
-        p = await gl.open_app_settings_async()
-        page.close(app_settings_dlg)
-        page.add(ft.Text(f"open_app_settings: {p}"))
-
-    location_settings_dlg = settings_dlg(handle_open_location_settings)
-    app_settings_dlg = settings_dlg(handle_open_app_settings)
-
-    page.add(
-        ft.Row(
-            wrap=True,
-            controls=[
-                ft.OutlinedButton(
-                    "Request Permission",
-                    on_click=handle_permission_request,
-                ),
-                ft.OutlinedButton(
-                    "Get Permission Status",
-                    on_click=handle_get_permission_status,
-                ),
-                ft.OutlinedButton(
-                    "Get Current Position",
-                    on_click=handle_get_current_position,
-                ),
-                ft.OutlinedButton(
-                    "Get Last Known Position",
-                    visible=False if page.web else True,
-                    on_click=handle_get_last_known_position,
-                ),
-                ft.OutlinedButton(
-                    "Is Location Service Enabled",
-                    on_click=handle_location_service_enabled,
-                ),
-                ft.OutlinedButton(
-                    "Open Location Settings",
-                    visible=False if page.web else True,
-                    on_click=lambda e: page.open(location_settings_dlg),
-                ),
-                ft.OutlinedButton(
-                    "Open App Settings",
-                    visible=False if page.web else True,
-                    on_click=lambda e: page.open(app_settings_dlg),
-                ),
-            ],
-        )
-    )
-
-
-ft.app(main)
-```
+For examples, see [this](./examples)
