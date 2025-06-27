@@ -1,340 +1,238 @@
-import json
-from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Optional
+import asyncio
+from dataclasses import field
+from typing import Optional
 
-from flet.core.control import Control
-from flet.core.control_event import ControlEvent
-from flet.core.event_handler import EventHandler
-from flet.core.ref import Ref
-from flet.core.types import (
-    ColorValue,
-    DurationValue,
-    OptionalControlEventCallable,
-    OptionalEventCallable,
-    OptionalNumber,
+import flet as ft
+
+from .types import (
+    GeolocatorConfiguration,
+    GeolocatorPermissionStatus,
+    GeolocatorPosition,
+    GeolocatorPositionChangeEvent,
 )
 
-
-class GeolocatorPositionAccuracy(Enum):
-    LOWEST = "lowest"
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    BEST = "best"
-    BEST_FOR_NAVIGATION = "bestForNavigation"
-    REDUCED = "reduced"
+__all__ = ["Geolocator"]
 
 
-class GeolocatorPermissionStatus(Enum):
-    DENIED = "denied"
-    DENIED_FOREVER = "deniedForever"
-    WHILE_IN_USE = "whileInUse"
-    ALWAYS = "always"
-    UNABLE_TO_DETERMINE = "unableToDetermine"
-
-
-class GeolocatorActivityType(Enum):
-    AUTOMOTIVE_NAVIGATION = "automotiveNavigation"
-    FITNESS = "fitness"
-    OTHER_NAVIGATION = "otherNavigation"
-    AIRBORNE = "airborne"
-    OTHER = "other"
-
-
-@dataclass
-class GeolocatorPosition:
-    latitude: OptionalNumber = None
-    longitude: OptionalNumber = None
-    speed: OptionalNumber = None
-    altitude: OptionalNumber = None
-    timestamp: OptionalNumber = None
-    accuracy: OptionalNumber = None
-    altitude_accuracy: OptionalNumber = None
-    heading: OptionalNumber = None
-    heading_accuracy: OptionalNumber = None
-    speed_accuracy: OptionalNumber = None
-    floor: Optional[int] = None
-    is_mocked: Optional[bool] = None
-
-
-@dataclass
-class GeolocatorSettings:
-    accuracy: Optional[GeolocatorPositionAccuracy] = None
-    distance_filter: Optional[int] = None
-    time_limit: DurationValue = None
-
-
-@dataclass
-class GeolocatorWebSettings(GeolocatorSettings):
-    maximum_age: DurationValue = None
-
-
-@dataclass
-class GeolocatorAppleSettings(GeolocatorSettings):
-    activity_type: Optional[GeolocatorActivityType] = None
-    pause_location_updates_automatically: Optional[bool] = False
-    show_background_location_indicator: Optional[bool] = False
-    allow_background_location_updates: Optional[bool] = True
-
-
-@dataclass
-class GeolocatorAndroidSettings(GeolocatorSettings):
-    force_location_manager: Optional[bool] = False
-    interval_duration: DurationValue = False
-    foreground_notification_text: Optional[str] = None
-    foreground_notification_title: Optional[str] = None
-    foreground_notification_channel_name: Optional[str] = "Background Location"
-    foreground_notification_enable_wake_lock: Optional[bool] = False
-    foreground_notification_enable_wifi_lock: Optional[bool] = False
-    foreground_notification_set_ongoing: Optional[bool] = False
-    foreground_notification_color: Optional[ColorValue] = None
-
-
-class GeolocatorPositionChangeEvent(ControlEvent):
-    def __init__(self, e: ControlEvent):
-        super().__init__(e.target, e.name, e.data, e.control, e.page)
-        d = json.loads(e.data)
-        self.latitude: float = d.get("lat")
-        self.longitude: float = d.get("long")
-
-
-class Geolocator(Control):
+@ft.control("Geolocator")
+class Geolocator(ft.Service):
     """
     A control that allows you to fetch GPS data from your device.
+
     This control is non-visual and should be added to `page.overlay` list.
-
-    -----
-
-    Online docs: https://flet.dev/docs/controls/geolocator
     """
 
-    def __init__(
-        self,
-        # Control
-        #
-        ref: Optional[Ref] = None,
-        data: Any = None,
-        location_settings: Optional[GeolocatorSettings] = None,
-        on_position_change: OptionalEventCallable[GeolocatorPositionChangeEvent] = None,
-        on_error: OptionalControlEventCallable = None,
-    ):
-        Control.__init__(
-            self,
-            ref=ref,
-            data=data,
-        )
-        self.__on_position_change = EventHandler(
-            lambda e: GeolocatorPositionChangeEvent(e)
-        )
-        self._add_event_handler(
-            "positionChange", self.__on_position_change.get_handler()
-        )
-        self.on_position_change = on_position_change
-        self.on_error = on_error
-        self.location_settings = location_settings
+    configuration: Optional[GeolocatorConfiguration] = None
+    """
+    Some additional configuration.
+    """
 
-    def _get_control_name(self):
-        return "geolocator"
+    on_position_change: ft.OptionalEventHandler[
+        GeolocatorPositionChangeEvent["Geolocator"]
+    ] = None
+    """
+    Fires when the position of the device changes.
 
-    def before_update(self):
-        self._set_attr_json("locationSettings", self.location_settings)
+    Event handler argument is of type [`GeolocatorPositionChangeEvent`][(p).].
+    """
 
-    def get_current_position(
-        self,
-        accuracy: Optional[
-            GeolocatorPositionAccuracy
-        ] = GeolocatorPositionAccuracy.BEST,
-        location_settings: Optional[GeolocatorSettings] = None,
-        wait_timeout: Optional[float] = 25,
-    ) -> GeolocatorPosition:
-        ls = (
-            location_settings
-            or self.location_settings
-            or GeolocatorSettings(accuracy=accuracy)
-        )
-        output = self.invoke_method(
-            "get_current_position",
-            {"location_settings": self._convert_attr_json(ls)},
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return (
-            GeolocatorPosition(**json.loads(output))
-            if output is not None
-            else GeolocatorPosition()
-        )
+    on_error: ft.OptionalControlEventHandler["Geolocator"] = None
+    """
+    Fires when an error occurs.
+    
+    The `data` property of the event handler argument contains information on the error. 
+    """
+
+    position: Optional[GeolocatorPosition] = field(default=None, init=False)  # todo: make this property readonly
+    """
+    The current position of the device. (read-only)
+
+    Starts as `None` and will be updated when the position changes.
+    """
 
     async def get_current_position_async(
         self,
-        accuracy: Optional[
-            GeolocatorPositionAccuracy
-        ] = GeolocatorPositionAccuracy.BEST,
-        location_settings: Optional[GeolocatorSettings] = None,
-        wait_timeout: Optional[float] = 25,
+        configuration: Optional[GeolocatorConfiguration] = None,
+        timeout: float = 30,
     ) -> GeolocatorPosition:
-        ls = (
-            location_settings
-            or self.location_settings
-            or GeolocatorSettings(accuracy=accuracy)
-        )
-        output = await self.invoke_method_async(
-            "get_current_position",
-            {"location_settings": self._convert_attr_json(ls)},
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return (
-            GeolocatorPosition(**json.loads(output))
-            if output is not None
-            else GeolocatorPosition()
-        )
+        """
+        Gets the current position of the device with the desired accuracy and settings.
 
-    def get_last_known_position(
-        self,
-        wait_timeout: Optional[float] = 25,
-    ) -> GeolocatorPosition:
-        assert not self.page.web, "get_last_known_position is not supported on web"
-        output = self.invoke_method(
-            "get_last_known_position",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
+        Args:
+            configuration: Additional configuration for the location request.
+                If not specified, then the [`Geolocator.configuration`][(p).] property is used.
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            The current position of the device as a [`GeolocatorPosition`][(p).].
+        Raises:
+            TimeoutError: If the request times out.
+
+        Note:
+            Depending on the availability of different location services, this can take several seconds.
+            It is recommended to call the [`get_last_known_position`][..] method first to receive a
+            known/cached position and update it with the result of the [`get_current_position`][..] method.
+        """
+        r = await self._invoke_method_async(
+            method_name="get_current_position",
+            arguments={"configuration": configuration or self.configuration},
+            timeout=timeout,
         )
-        return (
-            GeolocatorPosition(**json.loads(output))
-            if output is not None
-            else GeolocatorPosition()
-        )
+        return GeolocatorPosition(**r)
 
     async def get_last_known_position_async(
-        self,
-        wait_timeout: Optional[float] = 25,
+        self, timeout: float = 10
     ) -> GeolocatorPosition:
-        assert not self.page.web, "get_last_known_position is not supported on web"
-        output = await self.invoke_method_async(
-            "get_last_known_position",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return (
-            GeolocatorPosition(**json.loads(output))
-            if output is not None
-            else GeolocatorPosition()
-        )
+        """
+        Gets the last known position stored on the user's device.
+        The accuracy can be defined using the [`Geolocator.configuration`][(p).] property.
 
-    def get_permission_status(
-        self, wait_timeout: Optional[float] = 25
-    ) -> GeolocatorPermissionStatus:
-        p = self.invoke_method(
-            "get_permission_status",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return GeolocatorPermissionStatus(p)
+        Note:
+            This method is not supported on web plaform.
+
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            `True` if the app's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
+        """
+        assert not self.page.web, "get_last_known_position is not supported on web"
+        r = await self._invoke_method_async("get_last_known_position", timeout=timeout)
+        return GeolocatorPosition(**r)
 
     async def get_permission_status_async(
-        self, wait_timeout: Optional[float] = 25
+        self, timeout: float = 10
     ) -> GeolocatorPermissionStatus:
-        p = await self.invoke_method_async(
-            "get_permission_status",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return GeolocatorPermissionStatus(p)
+        """
+        Gets which permission the app has been granted to access the device's location.
 
-    def request_permission(
-        self, wait_timeout: Optional[float] = 25
-    ) -> GeolocatorPermissionStatus:
-        p = self.invoke_method(
-            "request_permission",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return GeolocatorPermissionStatus(p)
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            The status of the permission.
+        Raises:
+            TimeoutError: If the request times out.
+        """
+        r = await self._invoke_method_async("get_permission_status", timeout=timeout)
+        return GeolocatorPermissionStatus(r)
 
     async def request_permission_async(
-        self, wait_timeout: Optional[float] = 25
+        self, timeout: int = 60
     ) -> GeolocatorPermissionStatus:
-        p = await self.invoke_method_async(
-            "request_permission",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return GeolocatorPermissionStatus(p)
+        """
+        Requests the device for access to the device's location.
 
-    def is_location_service_enabled(self, wait_timeout: Optional[float] = 10) -> bool:
-        enabled = self.invoke_method(
-            "is_location_service_enabled",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return enabled == "true"
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            The status of the permission request.
+        Raises:
+            TimeoutError: If the request times out.
+        """
+        r = await self._invoke_method_async("request_permission", timeout=timeout)
+        return GeolocatorPermissionStatus(r)
 
-    async def is_location_service_enabled_async(
-        self, wait_timeout: Optional[float] = 10
-    ) -> bool:
-        enabled = await self.invoke_method_async(
-            "is_location_service_enabled",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return enabled == "true"
+    async def is_location_service_enabled_async(self, timeout: float = 10) -> bool:
+        """
+        Checks if location service is enabled.
 
-    def open_app_settings(self, wait_timeout: Optional[float] = 10) -> bool:
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            `True` if location service is enabled, `False` otherwise.
+        Raises:
+            TimeoutError: If the request times out.
+        """
+        return await self._invoke_method_async(
+            "is_location_service_enabled", timeout=timeout
+        )
+
+    async def open_app_settings_async(self, timeout: float = 10) -> bool:
+        """
+        Attempts to open the app's settings.
+
+        Note:
+            This method is not supported on web plaform.
+
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            `True` if the app's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
+        """
         assert not self.page.web, "open_app_settings is not supported on web"
-        opened = self.invoke_method(
-            "open_app_settings",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return opened == "true"
+        return await self._invoke_method_async("open_app_settings", timeout=timeout)
 
-    async def open_app_settings_async(self, wait_timeout: Optional[float] = 10) -> bool:
-        assert not self.page.web, "open_app_settings is not supported on web"
-        opened = await self.invoke_method_async(
-            "open_app_settings",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return opened == "true"
+    def open_location_settings(self, timeout: float = 10):
+        """
+        Attempts to open the device's location settings.
 
-    def open_location_settings(self, wait_timeout: Optional[float] = 10) -> bool:
+        Note:
+            This method is not supported on web plaform.
+
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            `True` if the device's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
+        """
+        asyncio.create_task(self.open_location_settings_async(timeout=timeout))
+
+    async def open_location_settings_async(self, timeout: float = 10):
+        """
+        Attempts to open the device's location settings.
+
+        Note:
+            This method is not supported on web plaform.
+
+        Args:
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            `True` if the device's settings were opened successfully, `False` otherwise.
+        Raises:
+            AssertionError: If invoked on a web platform.
+            TimeoutError: If the request times out.
+        """
         assert not self.page.web, "open_location_settings is not supported on web"
-        opened = self.invoke_method(
-            "open_location_settings",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return opened == "true"
+        await self._invoke_method_async("open_location_settings", timeout=timeout)
 
-    async def open_location_settings_async(
-        self, wait_timeout: Optional[float] = 10
-    ) -> bool:
-        assert not self.page.web, "open_location_settings is not supported on web"
-        opened = await self.invoke_method_async(
-            "open_location_settings",
-            wait_for_result=True,
-            wait_timeout=wait_timeout,
-        )
-        return opened == "true"
-
-    @property
-    def on_position_change(
+    async def distance_between_async(
         self,
-    ) -> OptionalEventCallable[GeolocatorPositionChangeEvent]:
-        return self.__on_position_change.handler
-
-    @on_position_change.setter
-    def on_position_change(
-        self, handler: OptionalEventCallable[GeolocatorPositionChangeEvent]
+        start_latitude: ft.Number,
+        start_longitude: ft.Number,
+        end_latitude: ft.Number,
+        end_longitude: ft.Number,
+        timeout: float = 10,
     ):
-        self.__on_position_change.handler = handler
-        self._set_attr("onPositionChange", True if handler is not None else None)
+        """
+        Calculates the distance between the supplied coordinates in meters.
 
-    @property
-    def on_error(self) -> OptionalControlEventCallable:
-        return self._get_attr("error")
+        The distance between the coordinates is calculated using the
+        Haversine formula (see https://en.wikipedia.org/wiki/Haversine_formula).
 
-    @on_error.setter
-    def on_error(self, handler: OptionalControlEventCallable):
-        self._add_event_handler("error", handler)
+        Args:
+            start_latitude: The latitude of the starting point, in degrees.
+            start_longitude: The longitude of the starting point, in degrees.
+            end_latitude: The latitude of the ending point, in degrees.
+            end_longitude: The longitude of the ending point, in degrees.
+            timeout: The maximum amount of time (in seconds) to wait for a response.
+        Returns:
+            The distance between the coordinates in meters.
+        Raises:
+            TimeoutError: If the request times out.
+        """
+        await self._invoke_method_async(
+            method_name="distance_between",
+            arguments={
+                "start_latitude": start_latitude,
+                "start_longitude": start_longitude,
+                "end_latitude": end_latitude,
+                "end_longitude": end_longitude,
+            },
+            timeout=timeout,
+        )

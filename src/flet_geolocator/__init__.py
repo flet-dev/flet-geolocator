@@ -1,12 +1,13 @@
-from flet_geolocator.geolocator import (
-    Geolocator,
-    GeolocatorActivityType,
-    GeolocatorAndroidSettings,
-    GeolocatorAppleSettings,
+from .geolocator import Geolocator
+from .types import (
+    ForegroundNotificationConfiguration,
+    GeolocatorAndroidConfiguration,
+    GeolocatorConfiguration,
+    GeolocatorIosActivityType,
+    GeolocatorIosConfiguration,
     GeolocatorPermissionStatus,
     GeolocatorPosition,
     GeolocatorPositionAccuracy,
     GeolocatorPositionChangeEvent,
-    GeolocatorSettings,
-    GeolocatorWebSettings,
+    GeolocatorWebConfiguration,
 )

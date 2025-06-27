@@ -7,16 +7,12 @@
 Adds geolocation capabilities to your [Flet](https://flet.dev) apps. 
 
 Features include:
-- Get the last known location;
-- Get the current location of the device;
-- Get continuous location updates;
-- Check if location services are enabled on the device.
+    - Get the last known location;
+    - Get the current location of the device;
+    - Get continuous location updates;
+    - Check if location services are enabled on the device.
 
 It is based on the [geolocator](https://pub.dev/packages/geolocator) Flutter package.
-
-## Documentation
-
-Detailed documentation to this package can be found [here](https://flet-dev.github.io/flet-geolocator/).
 
 ## Platform Support
 
@@ -31,26 +27,32 @@ This package supports the following platforms:
 | Android  |     ✅     |
 | Web      |     ✅     |
 
-## Installation
+## Usage
+
+### Installation
 
 To install the `flet-geolocator` package and add it to your project dependencies:
 
-- Using `uv`:
+=== "uv"
     ```bash
     uv add flet-geolocator
     ```
 
-- Using `pip`:
+=== "pip"
     ```bash
-    pip install flet-geolocator
+    pip install flet-geolocator  # (1)!
     ```
-    After this, you will have to manually add this package to your `requirements.txt` or `pyproject.toml`.
 
-- Using `poetry`:
+    1. After this, you will have to manually add this package to your `requirements.txt` or `pyproject.toml`.
+
+=== "poetry"
     ```bash
     poetry add flet-geolocator
     ```
 
-## Examples
 
-For examples, see [this](./examples)
+## Example
+
+```python title="main.py"
+--8<-- "examples/geolocator_example/src/main.py"
+``` 
