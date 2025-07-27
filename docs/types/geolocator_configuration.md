@@ -1,1 +1,1 @@
-::: flet_geolocator.types.GeolocatorPosition
+::: flet_geolocator.types.GeolocatorConfiguration
