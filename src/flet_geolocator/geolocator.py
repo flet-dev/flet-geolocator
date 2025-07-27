@@ -99,7 +99,7 @@ class Geolocator(ft.Service):
             timeout: The maximum amount of time (in seconds) to wait for a response.
 
         Returns:
-            `True` if the app's settings were opened successfully, `False` otherwise.
+            The last known position of the device as a [`GeolocatorPosition`][(p).].
 
         Raises:
             AssertionError: If invoked on a web platform.
