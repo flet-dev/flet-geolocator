@@ -1,21 +1,24 @@
 import datetime
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import flet as ft
 
+if TYPE_CHECKING:
+    from .geolocator import Geolocator  # noqa
+
 __all__ = [
-    "GeolocatorPositionAccuracy",
-    "GeolocatorPermissionStatus",
-    "GeolocatorIosActivityType",
-    "GeolocatorPosition",
-    "GeolocatorConfiguration",
-    "GeolocatorWebConfiguration",
-    "GeolocatorIosConfiguration",
-    "GeolocatorAndroidConfiguration",
-    "GeolocatorPositionChangeEvent",
     "ForegroundNotificationConfiguration",
+    "GeolocatorAndroidConfiguration",
+    "GeolocatorConfiguration",
+    "GeolocatorIosActivityType",
+    "GeolocatorIosConfiguration",
+    "GeolocatorPermissionStatus",
+    "GeolocatorPosition",
+    "GeolocatorPositionAccuracy",
+    "GeolocatorPositionChangeEvent",
+    "GeolocatorWebConfiguration",
 ]
 
 
@@ -89,7 +92,7 @@ class GeolocatorPermissionStatus(Enum):
 
     DENIED = "denied"
     """
-    Permission to access the device's location is denied. 
+    Permission to access the device's location is denied.
 
     The app should try to request permission using the [`Geolocator.request_permission`][(p).] method.
     """
@@ -175,7 +178,7 @@ class GeolocatorPosition:
     """
     The speed at which the device is traveling in meters per second over ground.
 
-    The speed is not available on all devices. 
+    The speed is not available on all devices.
     In these cases the value is `0.0`.
     """
 
@@ -183,7 +186,7 @@ class GeolocatorPosition:
     """
     The altitude of the device in meters.
 
-    The altitude is not available on all devices. 
+    The altitude is not available on all devices.
     In these cases the returned value is `0.0`.
     """
 
@@ -196,7 +199,7 @@ class GeolocatorPosition:
     """
     The estimated horizontal accuracy of the position in meters.
 
-    The accuracy is not available on all devices. 
+    The accuracy is not available on all devices.
     In these cases the value is `0.0`.
     """
 
@@ -204,7 +207,7 @@ class GeolocatorPosition:
     """
     The estimated vertical accuracy of the position in meters.
 
-    The accuracy is not available on all devices. 
+    The accuracy is not available on all devices.
     In these cases the value is `0.0`.
     """
 
@@ -212,7 +215,7 @@ class GeolocatorPosition:
     """
     The heading in which the device is traveling in degrees.
 
-    The heading is not available on all devices. 
+    The heading is not available on all devices.
     In these cases the value is `0.0`.
     """
 
@@ -220,7 +223,7 @@ class GeolocatorPosition:
     """
     The estimated heading accuracy of the position in degrees.
 
-    The heading accuracy is not available on all devices. 
+    The heading accuracy is not available on all devices.
     In these cases the value is `0.0`.
     """
 
@@ -228,7 +231,7 @@ class GeolocatorPosition:
     """
     The estimated speed accuracy of this position, in meters per second.
 
-    The speed accuracy is not available on all devices. 
+    The speed accuracy is not available on all devices.
     In these cases the value is `0.0`.
     """
 
@@ -237,7 +240,7 @@ class GeolocatorPosition:
     The floor specifies the floor of the building on which the device is
     located.
 
-    The floor property is only available on iOS and only when the information is available. 
+    The floor property is only available on iOS and only when the information is available.
     In all other cases this value will be `None`.
     """
 
@@ -261,7 +264,7 @@ class GeolocatorConfiguration:
     """
     The minimum distance (measured in meters) a device must move
     horizontally before an update event is generated.
-    
+
     Set to `0` when you want to be notified of all movements.
     """
 
@@ -280,8 +283,8 @@ class GeolocatorWebConfiguration(GeolocatorConfiguration):
     maximum_age: ft.DurationValue = field(default_factory=lambda: ft.Duration())
     """
     A value indicating the maximum age of a possible cached
-    position that is acceptable to return. If set to 0, it means 
-    that the device cannot use a cached position and must 
+    position that is acceptable to return. If set to 0, it means
+    that the device cannot use a cached position and must
     attempt to retrieve the real current position.
     """
 
@@ -300,7 +303,7 @@ class GeolocatorIosConfiguration(GeolocatorConfiguration):
     """
     Allows the location manager to pause updates to improve battery life
     on the target device without sacrificing location data.
-    When this property is set to `true`, the location manager pauses updates
+    When this property is set to `True`, the location manager pauses updates
     (and powers down the appropriate hardware) at times when the
     location data is unlikely to change.
     """
@@ -309,7 +312,7 @@ class GeolocatorIosConfiguration(GeolocatorConfiguration):
     """
     Flag to ask the Apple OS to show the background location indicator (iOS only)
     if app starts up and background and requests the users location.
-    
+
     For this setting to work and for the location to be retrieved the user must
     have granted "always" permissions for location retrieval.
     """
@@ -317,7 +320,7 @@ class GeolocatorIosConfiguration(GeolocatorConfiguration):
     allow_background_location_updates: bool = True
     """
     Flag to allow the app to receive location updates in the background (iOS only)
-    
+
     Note:
         For this setting to work `Info.plist` should contain the following keys:
             - UIBackgroundModes and the value should contain "location"
@@ -390,13 +393,13 @@ class GeolocatorAndroidConfiguration(GeolocatorConfiguration):
     Whether altitude should be calculated as MSL (EGM2008) from NMEA messages
     and reported as the altitude instead of using the geoidal height (WSG84). Setting
     this property true will help to align Android altitude to that of iOS which uses MSL.
-    
+
     If the NMEA message is empty then the altitude reported will still be the standard WSG84
     altitude from the GPS receiver.
-    
+
     MSL Altitude is only available starting from Android N and not all devices support
     NMEA message returning $GPGGA sequences.
-    
+
     This property only works with position stream updates and has no effect when getting the
     current position or last known position.
     """
@@ -405,7 +408,7 @@ class GeolocatorAndroidConfiguration(GeolocatorConfiguration):
 
 
 @dataclass
-class GeolocatorPositionChangeEvent(ft.Event[ft.EventControlType]):
+class GeolocatorPositionChangeEvent(ft.Event["Geolocator"]):
     position: GeolocatorPosition
     """
     The current/new position of the device.

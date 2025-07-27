@@ -65,7 +65,7 @@ async def main(page: ft.Page):
     async def handle_open_app_settings(e):
         p = await gl.open_app_settings_async()
         page.close(app_settings_dlg)
-        if p is True:
+        if p:
             show_snackbar("App settings opened successfully.")
         else:
             show_snackbar("App settings could not be opened.")
