@@ -34,28 +34,28 @@ async def main(page: ft.Page):
         page.show_dialog(ft.SnackBar(ft.Text(message)))
 
     async def handle_permission_request(e):
-        p = await gl.request_permission_async(timeout=60)
+        p = await gl.request_permission(timeout=60)
         page.add(ft.Text(f"request_permission: {p}"))
         show_snackbar(f"Permission request sent: {p}")
 
     async def handle_get_permission_status(e):
-        p = await gl.get_permission_status_async()
+        p = await gl.get_permission_status()
         show_snackbar(f"Permission status: {p}")
 
     async def handle_get_current_position(e):
-        p = await gl.get_current_position_async()
+        p = await gl.get_current_position()
         show_snackbar(f"Current position: ({p.latitude}, {p.longitude})")
 
     async def handle_get_last_known_position(e):
-        p = await gl.get_last_known_position_async()
+        p = await gl.get_last_known_position()
         show_snackbar(f"Last known position: ({p.latitude}, {p.longitude})")
 
     async def handle_location_service_enabled(e):
-        p = await gl.is_location_service_enabled_async()
+        p = await gl.is_location_service_enabled()
         show_snackbar(f"Location service enabled: {p}")
 
     async def handle_open_location_settings(e):
-        p = await gl.open_location_settings_async()
+        p = await gl.open_location_settings()
         page.close(location_settings_dlg)
         if p is True:
             show_snackbar("Location settings opened successfully.")
@@ -63,7 +63,7 @@ async def main(page: ft.Page):
             show_snackbar("Location settings could not be opened.")
 
     async def handle_open_app_settings(e):
-        p = await gl.open_app_settings_async()
+        p = await gl.open_app_settings()
         page.close(app_settings_dlg)
         if p:
             show_snackbar("App settings opened successfully.")
@@ -91,7 +91,7 @@ async def main(page: ft.Page):
                 ),
                 ft.OutlinedButton(
                     "Get Last Known Position",
-                    visible=False if page.web else True,
+                    visible=not page.web,
                     on_click=handle_get_last_known_position,
                 ),
                 ft.OutlinedButton(
@@ -100,12 +100,12 @@ async def main(page: ft.Page):
                 ),
                 ft.OutlinedButton(
                     "Open Location Settings",
-                    visible=False if page.web else True,  # (1)!
+                    visible=not page.web,  # (1)!
                     on_click=lambda e: page.open(location_settings_dlg),
                 ),
                 ft.OutlinedButton(
                     "Open App Settings",
-                    visible=False if page.web else True,  # (1)!
+                    visible=not page.web,  # (1)!
                     on_click=lambda e: page.open(app_settings_dlg),
                 ),
             ],

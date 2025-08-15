@@ -10,9 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Deployed online documentation: https://flet-dev.github.io/flet-geolocator/
-- `Geolocator` control new methods: `distance_between_async`
+- `Geolocator` control new methods: `distance_between`
 - `Geolocator` control new properties: `position`, `configuration`
-- New dataclasses: 
+- New dataclasses:
     - `GeolocatorConfiguration`
     - `GeolocatorWebConfiguration`
     - `GeolocatorIosConfiguration`
@@ -26,19 +26,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 #### Breaking Changes
 
 - `Geolocator` must now be added to `Page.services` instead of `Page.overlay`.
-- `Geolocator` method `get_current_position_async` parameters changed: 
+- `Geolocator` method `get_current_position_async` parameters changed:
     - removed `accuracy`
     - `location_settings` renamed to `configuration` (type changed)
     - `wait_timeout` renamed to `timeout`
 - In all `Geolocator` methods, parameter `wait_timeout` renamed to `timeout`.
-- Removed sync methods from `Geolocator`: 
-    - `get_current_position` → use `get_current_position_async` instead
-    - `get_last_known_position` → use `get_last_known_position_async` instead
-    - `get_permission_status` → use `get_permission_status_async` instead
-    - `request_permission` → use `request_permission_async` instead
-    - `is_location_service_enabled` → use `is_location_service_enabled_async` instead
-    - `open_app_settings` → use `open_app_settings_async` instead
-    - `open_location_settings` → use `open_location_settings_async` instead
+- The following `Geolocator` sync methods were made [`async`](https://docs.python.org/3/library/asyncio.html):
+    - `get_current_position`
+    - `get_last_known_position`
+    - `get_permission_status`
+    - `request_permission`
+    - `is_location_service_enabled`
+    - `open_app_settings`
+    - `open_location_settings`
 - Enum `GeolocatorActivityType` renamed to `GeolocatorIosActivityType`
 
 ## [0.1.0] - 2025-01-15
