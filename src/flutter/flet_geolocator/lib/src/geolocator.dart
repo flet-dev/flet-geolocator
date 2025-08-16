@@ -67,7 +67,7 @@ class GeolocatorService extends FletService {
         break;
       case "open_location_settings":
         if (!kIsWeb) {
-          await Geolocator.openLocationSettings();
+          return await Geolocator.openLocationSettings();
         }
         break;
       case "get_last_known_position":

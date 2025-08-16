@@ -187,7 +187,7 @@ class Geolocator(ft.Service):
             timeout=timeout,
         )
 
-    async def open_location_settings(self, timeout: float = 10):
+    async def open_location_settings(self, timeout: float = 10) -> bool:
         """
         Attempts to open the device's location settings.
 
@@ -205,7 +205,7 @@ class Geolocator(ft.Service):
             TimeoutError: If the request times out.
         """
         assert not self.page.web, "open_location_settings is not supported on web"
-        await self._invoke_method(
+        return await self._invoke_method(
             "open_location_settings",
             timeout=timeout,
         )
