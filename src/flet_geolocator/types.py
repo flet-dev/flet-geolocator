@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional
 import flet as ft
 
 if TYPE_CHECKING:
-    from .geolocator import Geolocator  # noqa
+    from flet_geolocator.geolocator import Geolocator  # noqa
 
 __all__ = [
     "ForegroundNotificationConfiguration",

@@ -3,7 +3,7 @@ from typing import Optional
 
 import flet as ft
 
-from .types import (
+from flet_geolocator.types import (
     GeolocatorConfiguration,
     GeolocatorPermissionStatus,
     GeolocatorPosition,

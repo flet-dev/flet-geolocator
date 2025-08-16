@@ -4,7 +4,7 @@
 [![downloads](https://static.pepy.tech/badge/flet-geolocator/month)](https://pepy.tech/project/flet-geolocator)
 [![license](https://img.shields.io/github/license/flet-dev/flet-geolocator.svg)](https://github.com/flet-dev/flet-geolocator/blob/main/LICENSE)
 
-Adds geolocation capabilities to your [Flet](https://flet.dev) apps. 
+Adds geolocation capabilities to your [Flet](https://flet.dev) apps.
 
 Features include:
 - Get the last known location;
@@ -31,7 +31,9 @@ This package supports the following platforms:
 | Android  |     ✅     |
 | Web      |     ✅     |
 
-## Installation
+## Usage
+
+### Installation
 
 To install the `flet-geolocator` package and add it to your project dependencies:
 
@@ -51,6 +53,6 @@ To install the `flet-geolocator` package and add it to your project dependencies
     poetry add flet-geolocator
     ```
 
-## Examples
+### Examples
 
-For examples, see [this](./examples)
+For examples, see [these](./examples).

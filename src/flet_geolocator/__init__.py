@@ -1,5 +1,5 @@
-from .geolocator import Geolocator
-from .types import (
+from flet_geolocator.geolocator import Geolocator
+from flet_geolocator.types import (
     ForegroundNotificationConfiguration,
     GeolocatorAndroidConfiguration,
     GeolocatorConfiguration,
