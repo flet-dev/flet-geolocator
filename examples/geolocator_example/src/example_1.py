@@ -1,3 +1,5 @@
+from typing import Callable
+
 import flet as ft
 
 import flet_geolocator as ftg
@@ -10,102 +12,103 @@ async def main(page: ft.Page):
     def handle_position_change(e: ftg.GeolocatorPositionChangeEvent):
         page.add(ft.Text(f"New position: {e.position.latitude} {e.position.longitude}"))
 
-    gl = ftg.Geolocator(
-        configuration=ftg.GeolocatorConfiguration(
-            accuracy=ftg.GeolocatorPositionAccuracy.LOW
-        ),
-        on_position_change=handle_position_change,
-        on_error=lambda e: page.add(ft.Text(f"Error: {e.data}")),
-    )
-    page.services.append(gl)
-
-    settings_dlg = lambda handler: ft.AlertDialog(
-        adaptive=True,
-        title="Opening Location Settings...",
-        content=ft.Text(
-            "You are about to be redirected to the location/app settings. "
-            "Please locate this app and grant it location permissions."
-        ),
-        actions=[ft.TextButton("Take me there", on_click=handler)],
-        actions_alignment=ft.MainAxisAlignment.CENTER,
-    )
+    def get_dialog(handler: Callable):
+        return ft.AlertDialog(
+            adaptive=True,
+            title="Opening Location Settings...",
+            content=ft.Text(
+                "You are about to be redirected to the location/app settings. "
+                "Please locate this app and grant it location permissions."
+            ),
+            actions=[ft.TextButton("Take me there", on_click=handler)],
+            actions_alignment=ft.MainAxisAlignment.CENTER,
+        )
 
     def show_snackbar(message):
         page.show_dialog(ft.SnackBar(ft.Text(message)))
 
-    async def handle_permission_request(e):
-        p = await gl.request_permission_async(timeout=60)
+    async def handle_permission_request(e: ft.Event[ft.OutlinedButton]):
+        p = await geo.request_permission(timeout=60)
         page.add(ft.Text(f"request_permission: {p}"))
         show_snackbar(f"Permission request sent: {p}")
 
-    async def handle_get_permission_status(e):
-        p = await gl.get_permission_status_async()
+    async def handle_get_permission_status(e: ft.Event[ft.OutlinedButton]):
+        p = await geo.get_permission_status()
         show_snackbar(f"Permission status: {p}")
 
-    async def handle_get_current_position(e):
-        p = await gl.get_current_position_async()
+    async def handle_get_current_position(e: ft.Event[ft.OutlinedButton]):
+        p = await geo.get_current_position()
         show_snackbar(f"Current position: ({p.latitude}, {p.longitude})")
 
     async def handle_get_last_known_position(e):
-        p = await gl.get_last_known_position_async()
+        p = await geo.get_last_known_position()
         show_snackbar(f"Last known position: ({p.latitude}, {p.longitude})")
 
     async def handle_location_service_enabled(e):
-        p = await gl.is_location_service_enabled_async()
+        p = await geo.is_location_service_enabled()
         show_snackbar(f"Location service enabled: {p}")
 
-    async def handle_open_location_settings(e):
-        p = await gl.open_location_settings_async()
+    async def handle_open_location_settings(e: ft.Event[ft.OutlinedButton]):
+        p = await geo.open_location_settings()
         page.close(location_settings_dlg)
         if p is True:
             show_snackbar("Location settings opened successfully.")
         else:
             show_snackbar("Location settings could not be opened.")
 
-    async def handle_open_app_settings(e):
-        p = await gl.open_app_settings_async()
+    async def handle_open_app_settings(e: ft.Event[ft.OutlinedButton]):
+        p = await geo.open_app_settings()
         page.close(app_settings_dlg)
         if p:
             show_snackbar("App settings opened successfully.")
         else:
             show_snackbar("App settings could not be opened.")
 
-    location_settings_dlg = settings_dlg(handle_open_location_settings)
-    app_settings_dlg = settings_dlg(handle_open_app_settings)
+    location_settings_dlg = get_dialog(handle_open_location_settings)
+    app_settings_dlg = get_dialog(handle_open_app_settings)
+
+    geo = ftg.Geolocator(
+        configuration=ftg.GeolocatorConfiguration(
+            accuracy=ftg.GeolocatorPositionAccuracy.LOW
+        ),
+        on_position_change=handle_position_change,
+        on_error=lambda e: page.add(ft.Text(f"Error: {e.data}")),
+    )
+    page.services.append(geo)
 
     page.add(
         ft.Row(
             wrap=True,
             controls=[
                 ft.OutlinedButton(
-                    "Request Permission",
+                    content="Request Permission",
                     on_click=handle_permission_request,
                 ),
                 ft.OutlinedButton(
-                    "Get Permission Status",
+                    content="Get Permission Status",
                     on_click=handle_get_permission_status,
                 ),
                 ft.OutlinedButton(
-                    "Get Current Position",
+                    content="Get Current Position",
                     on_click=handle_get_current_position,
                 ),
                 ft.OutlinedButton(
-                    "Get Last Known Position",
-                    visible=False if page.web else True,
+                    content="Get Last Known Position",
+                    visible=not page.web,
                     on_click=handle_get_last_known_position,
                 ),
                 ft.OutlinedButton(
-                    "Is Location Service Enabled",
+                    content="Is Location Service Enabled",
                     on_click=handle_location_service_enabled,
                 ),
                 ft.OutlinedButton(
-                    "Open Location Settings",
-                    visible=False if page.web else True,  # (1)!
+                    content="Open Location Settings",
+                    visible=not page.web,  # (1)!
                     on_click=lambda e: page.open(location_settings_dlg),
                 ),
                 ft.OutlinedButton(
-                    "Open App Settings",
-                    visible=False if page.web else True,  # (1)!
+                    content="Open App Settings",
+                    visible=not page.web,  # (1)!
                     on_click=lambda e: page.open(app_settings_dlg),
                 ),
             ],

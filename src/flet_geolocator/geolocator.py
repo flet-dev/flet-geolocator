@@ -1,10 +1,9 @@
-import asyncio
 from dataclasses import field
 from typing import Optional
 
 import flet as ft
 
-from .types import (
+from flet_geolocator.types import (
     GeolocatorConfiguration,
     GeolocatorPermissionStatus,
     GeolocatorPosition,
@@ -50,7 +49,7 @@ class Geolocator(ft.Service):
     Starts as `None` and will be updated when the position changes.
     """
 
-    async def get_current_position_async(
+    async def get_current_position(
         self,
         configuration: Optional[GeolocatorConfiguration] = None,
         timeout: float = 30,
@@ -77,16 +76,14 @@ class Geolocator(ft.Service):
         Raises:
             TimeoutError: If the request times out.
         """
-        r = await self._invoke_method_async(
+        r = await self._invoke_method(
             method_name="get_current_position",
             arguments={"configuration": configuration or self.configuration},
             timeout=timeout,
         )
         return GeolocatorPosition(**r)
 
-    async def get_last_known_position_async(
-        self, timeout: float = 10
-    ) -> GeolocatorPosition:
+    async def get_last_known_position(self, timeout: float = 10) -> GeolocatorPosition:
         """
         Gets the last known position stored on the user's device.
         The accuracy can be defined using the
@@ -106,13 +103,13 @@ class Geolocator(ft.Service):
             TimeoutError: If the request times out.
         """
         assert not self.page.web, "get_last_known_position is not supported on web"
-        r = await self._invoke_method_async(
+        r = await self._invoke_method(
             "get_last_known_position",
             timeout=timeout,
         )
         return GeolocatorPosition(**r)
 
-    async def get_permission_status_async(
+    async def get_permission_status(
         self, timeout: float = 10
     ) -> GeolocatorPermissionStatus:
         """
@@ -127,15 +124,13 @@ class Geolocator(ft.Service):
         Raises:
             TimeoutError: If the request times out.
         """
-        r = await self._invoke_method_async(
+        r = await self._invoke_method(
             "get_permission_status",
             timeout=timeout,
         )
         return GeolocatorPermissionStatus(r)
 
-    async def request_permission_async(
-        self, timeout: int = 60
-    ) -> GeolocatorPermissionStatus:
+    async def request_permission(self, timeout: int = 60) -> GeolocatorPermissionStatus:
         """
         Requests the device for access to the device's location.
 
@@ -148,13 +143,13 @@ class Geolocator(ft.Service):
         Raises:
             TimeoutError: If the request times out.
         """
-        r = await self._invoke_method_async(
+        r = await self._invoke_method(
             "request_permission",
             timeout=timeout,
         )
         return GeolocatorPermissionStatus(r)
 
-    async def is_location_service_enabled_async(self, timeout: float = 10) -> bool:
+    async def is_location_service_enabled(self, timeout: float = 10) -> bool:
         """
         Checks if location service is enabled.
 
@@ -167,11 +162,9 @@ class Geolocator(ft.Service):
         Raises:
             TimeoutError: If the request times out.
         """
-        return await self._invoke_method_async(
-            "is_location_service_enabled", timeout=timeout
-        )
+        return await self._invoke_method("is_location_service_enabled", timeout=timeout)
 
-    async def open_app_settings_async(self, timeout: float = 10) -> bool:
+    async def open_app_settings(self, timeout: float = 10) -> bool:
         """
         Attempts to open the app's settings.
 
@@ -189,31 +182,12 @@ class Geolocator(ft.Service):
             TimeoutError: If the request times out.
         """
         assert not self.page.web, "open_app_settings is not supported on web"
-        return await self._invoke_method_async(
+        return await self._invoke_method(
             "open_app_settings",
             timeout=timeout,
         )
 
-    def open_location_settings(self, timeout: float = 10):
-        """
-        Attempts to open the device's location settings.
-
-        Note:
-            This method is not supported on web plaform.
-
-        Args:
-            timeout: The maximum amount of time (in seconds) to wait for a response.
-
-        Returns:
-            `True` if the device's settings were opened successfully, `False` otherwise.
-
-        Raises:
-            AssertionError: If invoked on a web platform.
-            TimeoutError: If the request times out.
-        """
-        asyncio.create_task(self.open_location_settings_async(timeout=timeout))
-
-    async def open_location_settings_async(self, timeout: float = 10):
+    async def open_location_settings(self, timeout: float = 10) -> bool:
         """
         Attempts to open the device's location settings.
 
@@ -231,12 +205,12 @@ class Geolocator(ft.Service):
             TimeoutError: If the request times out.
         """
         assert not self.page.web, "open_location_settings is not supported on web"
-        await self._invoke_method_async(
+        return await self._invoke_method(
             "open_location_settings",
             timeout=timeout,
         )
 
-    async def distance_between_async(
+    async def distance_between(
         self,
         start_latitude: ft.Number,
         start_longitude: ft.Number,
@@ -263,7 +237,7 @@ class Geolocator(ft.Service):
         Raises:
             TimeoutError: If the request times out.
         """
-        await self._invoke_method_async(
+        await self._invoke_method(
             method_name="distance_between",
             arguments={
                 "start_latitude": start_latitude,

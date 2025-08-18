@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional
 import flet as ft
 
 if TYPE_CHECKING:
-    from .geolocator import Geolocator  # noqa
+    from flet_geolocator.geolocator import Geolocator  # noqa
 
 __all__ = [
     "ForegroundNotificationConfiguration",
@@ -94,15 +94,16 @@ class GeolocatorPermissionStatus(Enum):
     """
     Permission to access the device's location is denied.
 
-    The app should try to request permission using the [`Geolocator.request_permission`][(p).] method.
+    The app should try to request permission using the
+    [`Geolocator.request_permission`][(p).] method.
     """
 
     DENIED_FOREVER = "deniedForever"
     """
     Permission to access the device's location is permanently denied.
 
-    When requesting permissions, the permission dialog will not be shown until the user updates
-    the permission in the app settings.
+    When requesting permissions, the permission dialog will not be shown until the
+    user updates the permission in the app settings.
     """
 
     WHILE_IN_USE = "whileInUse"
@@ -112,15 +113,16 @@ class GeolocatorPermissionStatus(Enum):
 
     ALWAYS = "always"
     """
-    Permission to access the device's location is allowed even when the app is running in the background.
+    Permission to access the device's location is allowed even when the app is
+    running in the background.
     """
 
     UNABLE_TO_DETERMINE = "unableToDetermine"
     """
     Permission status cannot be determined.
 
-    This status is only returned by the [`Geolocator.request_permission`][(p).] method on the web platform
-    for browsers that did not implement the Permissions API.
+    This status is only returned by the [`Geolocator.request_permission`][(p).] method
+    on the web platform for browsers that did not implement the Permissions API.
     See: https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
     """
 
@@ -240,7 +242,8 @@ class GeolocatorPosition:
     The floor specifies the floor of the building on which the device is
     located.
 
-    The floor property is only available on iOS and only when the information is available.
+    The floor property is only available on iOS
+    and only when the information is available.
     In all other cases this value will be `None`.
     """
 
@@ -363,7 +366,8 @@ class ForegroundNotificationConfiguration:
     """
     When enabled, a WifiLock is acquired when background execution is started.
     This allows the application to keep the Wi-Fi radio awake, even when the
-    user has not used the device in a while (e.g. for background network communications).
+    user has not used the device in a while
+    (e.g. for background network communications).
 
     Wifi lock permissions should be obtained first by using a permissions library.
     """
@@ -392,16 +396,17 @@ class GeolocatorAndroidConfiguration(GeolocatorConfiguration):
     """
     Whether altitude should be calculated as MSL (EGM2008) from NMEA messages
     and reported as the altitude instead of using the geoidal height (WSG84). Setting
-    this property true will help to align Android altitude to that of iOS which uses MSL.
+    this property true will help to align Android altitude to that of iOS which
+    uses MSL.
 
-    If the NMEA message is empty then the altitude reported will still be the standard WSG84
-    altitude from the GPS receiver.
+    If the NMEA message is empty then the altitude reported will still be
+    the standard WSG84 altitude from the GPS receiver.
 
     MSL Altitude is only available starting from Android N and not all devices support
     NMEA message returning $GPGGA sequences.
 
-    This property only works with position stream updates and has no effect when getting the
-    current position or last known position.
+    This property only works with position stream updates and has no effect when
+    getting the current position or last known position.
     """
 
     foreground_notification_config: Optional[ForegroundNotificationConfiguration] = None

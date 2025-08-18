@@ -4,7 +4,7 @@
 [![downloads](https://static.pepy.tech/badge/flet-geolocator/month)](https://pepy.tech/project/flet-geolocator)
 [![license](https://img.shields.io/github/license/flet-dev/flet-geolocator.svg)](https://github.com/flet-dev/flet-geolocator/blob/main/LICENSE)
 
-Adds geolocation capabilities to your [Flet](https://flet.dev) apps. 
+Adds geolocation capabilities to your [Flet](https://flet.dev) apps.
 
 Features include:
     - Get the last known location;
@@ -50,9 +50,6 @@ To install the `flet-geolocator` package and add it to your project dependencies
     poetry add flet-geolocator
     ```
 
+### Examples
 
-## Example
-
-```python title="main.py"
---8<-- "examples/geolocator_example/src/main.py"
-``` 
+See [these](geolocator.md#examples).
