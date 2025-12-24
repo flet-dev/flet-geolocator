@@ -1,3 +1,7 @@
+# THIS PROJECT HAS BEEN ARCHIVED
+
+`flet-geolocator` is now part of the main [Flet repository](https://github.com/flet-dev/flet/tree/main/sdk/python/packages/flet-geolocator).
+
 # flet-geolocator
 
 [![pypi](https://img.shields.io/pypi/v/flet-geolocator.svg)](https://pypi.python.org/pypi/flet-geolocator)
